@@ -105,6 +105,9 @@ function parseRubyEngineAndVersion(rubyVersion) {
 
   let engine, version
 
+  console.log("rubyVersion:" + rubyVersion)
+  console.log("versionFilePath:" + versionFilePath)
+
   if (rubyVersion === 'default' && versionFilePath) {
     const contents = fs.readFileSync(versionFilePath, 'utf8')
     const lines = contents.split(/\r?\n/)
