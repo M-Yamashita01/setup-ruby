@@ -66709,7 +66709,7 @@ function parseRubyEngineAndVersion(inputs) {
 
   let engine, version
 
-  console.log("inputs: " + inputs)
+  console.log("inputs: " + JSON.stringify(inputs, null, 2))
   console.log("rubyVersion: " + rubyVersion)
   console.log("versionFilePath: " + versionFilePath)
 
