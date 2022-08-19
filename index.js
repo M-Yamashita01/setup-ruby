@@ -96,7 +96,7 @@ export async function setupRuby(options = {}) {
   core.setOutput('ruby-prefix', rubyPrefix)
 }
 
-function parseRubyEngineAndVersion(rubyVersion) {
+function parseRubyEngineAndVersion(inputs) {
   let rubyVersion = inputs['ruby-version']
   let versionFilePath = inputs['ruby-version-file']
   if (rubyVersion !== 'default' && versionFilePath) {
@@ -121,6 +121,7 @@ function parseRubyEngineAndVersion(rubyVersion) {
       }else {
         throw new Error('no ruby version in Gemfile.lock.')
       }
+    }
   } else {
     if (rubyVersion === 'default') {
       if (fs.existsSync('.ruby-version')) {
