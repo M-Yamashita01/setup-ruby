@@ -99,11 +99,26 @@ export async function setupRuby(options = {}) {
 function parseRubyEngineAndVersion(rubyVersion) {
   let rubyVersion = inputs['ruby-version']
   let versionFilePath = inputs['ruby-version-file']
-  if (rubyVersion && versionFilePath) {
-    core.warning('Both ruby-version and ruby-version-file inputs are specified, only ruby-version will be used');
+  if (rubyVersion !== 'default' && versionFilePath) {
+    core.warning('The ruby-version input is not `default` and ruby-version-file input is specified, only ruby-version will be used')
   }
 
-  if (rubyVersion){
+  let engine, version
+
+  if (rubyVersion === 'default' && versionFilePath) {
+    const contents = fs.readFileSync(versionFilePath, 'utf8')
+    const lines = contents.split(/\r?\n/)
+    const rubyVersionLine = lines.findIndex(line => /^RUBY VERSION$/.test(line.trim()))
+    if (rubyVersionLine !== -1) {
+      const nextLine = lines[rubyVersionLine + 1]
+      if (nextLine && /^\d+/.test(nextLine.trim())) {
+        engine = "ruby"
+        const trimmedNextLine = nextLine.trim()
+        version = trimmedNextLine.match(/\d.\d.\d/)
+      }else {
+        throw new Error('no ruby version in Gemfile.lock.')
+      }
+  } else {
     if (rubyVersion === 'default') {
       if (fs.existsSync('.ruby-version')) {
         rubyVersion = '.ruby-version'
@@ -124,7 +139,6 @@ function parseRubyEngineAndVersion(rubyVersion) {
       console.log(`Using ${rubyVersion} as input from file .tool-versions`)
     }
 
-    let engine, version
     if (/^(\d+)/.test(rubyVersion) || common.isHeadVersion(rubyVersion)) { // X.Y.Z => ruby-X.Y.Z
       engine = 'ruby'
       version = rubyVersion
@@ -134,21 +148,6 @@ function parseRubyEngineAndVersion(rubyVersion) {
     } else { // engine-X.Y.Z
       [engine, version] = common.partition(rubyVersion, '-')
     }
-  } else if (versionFilePath){
-    const contents = fs.readFileSync(versionFilePath, 'utf8')
-    const lines = contents.split(/\r?\n/)
-    const rubyVersionLine = lines.findIndex(line => /^RUBY VERSION$/.test(line.trim()))
-    if (rubyVersionLine !== -1) {
-      const nextLine = lines[rubyVersionLine + 1]
-      if (nextLine && /^\d+/.test(nextLine.trim())) {
-        engine = "ruby"
-        const trimmedNextLine = nextLine.trim()
-        version = trimmedNextLine.match(/\d.\d.\d/)
-      }else {
-        throw new Error('no ruby version in Gemfile.lock.')
-      }
-  }else {
-    throw new Error('no ruby version in Gemfile.lock.')
   }
 
   return [engine, version]
