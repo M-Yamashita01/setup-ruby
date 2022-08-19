@@ -66709,8 +66709,9 @@ function parseRubyEngineAndVersion(inputs) {
 
   let engine, version
 
-  console.log("rubyVersion:" + rubyVersion)
-  console.log("versionFilePath:" + versionFilePath)
+  console.log("inputs: " + inputs)
+  console.log("rubyVersion: " + rubyVersion)
+  console.log("versionFilePath: " + versionFilePath)
 
   if (rubyVersion === 'default' && versionFilePath) {
     const contents = fs.readFileSync(versionFilePath, 'utf8')
